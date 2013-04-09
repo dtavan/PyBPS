@@ -2,14 +2,14 @@
 PyBPS
 =====
 
-PyBPS is a parametric simulation manager, mainly for the `TRNSYS <http://trnsys.com>`_ and `DAYSIM <http://daysim.ning.com>`_ simulation tools, although its features can easily be extended to other text-based input tools.
-It provides a framework for running parametric simulation jobs and includes modules to:
+PyBPS is a parametric simulation manager that provides a framework for running parametric simulation jobs in an efficient way.
+It includes modules to:
 
 * Pre-process parametric simulation jobs (prepare simulation input files with a specific set of paramaters)
 
-* Run simulation jobs in parallel, making the most of available processors to run the parametric job faster
+* Run simulation jobs in parallel, making the most of available processors to run the parametric jobs faster
 
-* Post-process simulation jobs, by extracting results directly from TRNSYS and DAYSIM output files
+* Post-process simulation jobs, by extracting results directly from simulation output files
 
 * Store simulation parameters and results in an SQlite database and a set of CSV files for subsequent analysis
 
