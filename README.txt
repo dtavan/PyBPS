@@ -79,10 +79,10 @@ For example, it is possible to have several simulation input files listed in the
 
 A particular job can be manage using the following methods::
 
-	bpsproj.jobs[0].prepare()    # Copy all simulation files to a temporary directory where the first job will be run
-	bpsproj.jobs[0].preprocess() # Create simulation input files with the set of parameters corresponding to this first job
+	bpsproj.jobs[0].prepare()    # Copy all simulation files to a temp directory where the first job will be run
+	bpsproj.jobs[0].preprocess() # Create simulation input files with set of parameters for first job
 	bpsproj.jobs[0].run()        # Run the first job
-	bpsproj.jobs[0].close()      # Copy result and log files to results directory, get job run summary info and delete temp directory
+	bpsproj.jobs[0].close()      # Copy result and log files to results dir, get job run summary and delete temp dir
 	
 The decision of which result and log files should be copied to the *Results* directory depends on the files extensions specified in the *ResultFile_Extensions* and *LogFile_Extensions* keywords of the ``config.ini`` file.
 	
