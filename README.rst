@@ -5,15 +5,15 @@ PyBPS
 PyBPS is a parametric simulation manager that provides a framework for running parametric simulation jobs in an efficient way.
 It includes modules to:
 
-* Pre-process parametric simulation jobs (prepare simulation input files with a specific set of paramaters)
+* **Pre-process parametric simulation jobs** (prepare simulation input files with a specific set of paramaters)
 
-* Run simulation jobs in parallel, making the most of available processors to run the parametric jobs faster
+* **Run simulation jobs in parallel**, making the most of available processors to run the parametric jobs faster
 
-* Post-process simulation jobs, by extracting results directly from simulation output files
+* **Post-process simulation jobs**, by extracting results directly from simulation output files
 
-* Store simulation parameters and results in an SQlite database and a set of CSV files for subsequent analysis
+* **Store simulation parameters and results** in an SQlite database and a set of CSV files for subsequent analysis
 
-* Produce a simulation run summary, including execution times of all simulated jobs, warnings and errors.
+* **Produce a simulation run summary**, including execution times of all simulated jobs, warnings and errors.
 
 The package uses ``pandas`` DataFrames to handle data, which opens a lot of possibilities in terms of data analysis. Users can therefore leverage all of the power of the ``pandas`` package to analyze simulation results.
 Using ``pandas`` also makes it very straightforward to plot results using the ``matplotlib`` package.
