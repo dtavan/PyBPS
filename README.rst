@@ -32,6 +32,12 @@ Configuration
 
 Prior to using PyBPS, you first have to configure simulation tools options in *pybps/config.ini*
 
+Currently, PyBPS works with the following building performance simulation tools:
+
+* `TRNSYS v17 <http://trnsys.com>`_
+
+* `DAYSIM v3.1b <http://daysim.ning.com>`_
+
 Most of the configuration options should be left to their default value. However, the user should revise the following options:
 
 * Simulation tool installation directory
