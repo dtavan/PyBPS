@@ -1,6 +1,2 @@
 include README.rst
-include pybps/config.ini
-recursive-include pybps/preprocess *.py
-recursive-include pybps/postprocess *.py
 include *.txt
-recursive-include docs *.txt
