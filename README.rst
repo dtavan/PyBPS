@@ -55,6 +55,14 @@ Most of the configuration options should be left to their default value. However
     *SampleFile_SearchString = _Sample*
 
 	
+Currently, the following building performance simulation tools ar supported:
+
+* `TRNSYS v17 <http://trnsys.com>`_
+
+* `DAYSIM v3.1b <http://daysim.ning.com>`_
+	
+	
+	
 Usage
 =====
 
