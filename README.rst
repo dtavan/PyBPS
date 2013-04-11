@@ -33,7 +33,7 @@ Configuration
 
 Prior to using PyBPS, you first have to configure simulation tools options in the ``config.ini`` file located at the root of the ``pybps`` directory.
 
-Currently, PyBPS works with the following building performance simulation tools:
+Currently, PyBPS works on Windows with the following building performance simulation tools:
 
 * `TRNSYS v17 <http://trnsys.com>`_
 
@@ -41,25 +41,61 @@ Currently, PyBPS works with the following building performance simulation tools:
 
 Most of the configuration options should be left to their default value. However, the user should revise the following options:
 
-* Simulation tool installation directory
+Simulation tool installation directory
+--------------------------------------
+::
 
-    *Install_Dir = C:/TRNSYS*
+    [TRNSYS]
+    Install_Dir = C:\TRNSYS17  # Default installation directory for TRNSYS v17
+
+    [DAYSIM]
+    Install_Dir = C:\DAYSIM   # Default installation directory for DAYSIM
+    
+**IMPORTANT:** If your DAYSIM install directory is different from the one above, you will also have to modify the ``DAYSIMPATH`` in the batch script ``pybps_daysim-exe.bat`` found in ``C:\Python27\Scripts``
 	
-* Extensions of simulation result files
+Simulation result file extensions
+----------------------------------
 
-    *ResultFile_Extensions = .out, .month*
+Simulation result files are files that might require post-processing and that will be exported to CSV and/or SQlite database.
+::
 
-* Extensions of simulation log files
+    [TRNSYS]
+    ResultFile_Extensions = .out, .month  # Default extensions for TRNSYS output files
 
-    *LogFile_Extensions = .log*
+    [DAYSIM]
+    ResultFile_Extensions = .el.htm, .DA  # Default extensions for DAYSIM output files
+
+Simulation log file extensions
+-------------------------------
+
+Log files are files that are just kept for reference.
+::
+
+    [TRNSYS]
+    LogFile_Extensions = .log  # Default extensions for TRNSYS log files
+
+    [DAYSIM]
+    LogFile_Extensions = _active.intgain.csv  # Default extensions for DAYSIM log files
+    
+Actually, DAYSIM does not produce log files, but this field can't be empty so just put here the extensions of files that won't need post-processing.
+
+Template files search string
+----------------------------
+
+These are used to identify which files are templates.
+Template filenames should contain the specified string.
+::
 	
-* Search strings for template files (used to identify which files are templates; template filenames should contain the specified string)
-	
-    *TemplateFile_SearchString = _Template*
+    TemplateFile_SearchString = _Template
 
-* Search strings for parameter sample files (used to identify which files are parameter samples; sample filenames should contain the specified string)	
+Parameter sample files search string
+------------------------------------
 
-    *SampleFile_SearchString = _Sample*
+These are used to identify which files are parameter samples
+Sample filenames should contain the specified string.
+::	
+
+    SampleFile_SearchString = _Sample
 
 	
 Prerequisites

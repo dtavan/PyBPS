@@ -22,5 +22,5 @@ setup(
     packages = find_packages(),
     package_data = {'':['*.ini']},
     install_requires = ['pandas'],
-    scripts = ['bin/pybps-script.py'],
+    scripts = ['bin/pybps-script.py','bin/pybps_daysim-exe.bat'],
 )
