@@ -65,6 +65,9 @@ Simulation result files are files that might require post-processing and that wi
     [DAYSIM]
     ResultFile_Extensions = .el.htm, .DA  # Default extensions for DAYSIM output files
 
+In the current version of PyBPS, only ``Type46`` monthly integrated TRNSYS results can be parsed automatically by the built-in functions.
+Future version of PyBPS will support additional TRNSYS output formats.
+	
 Simulation log file extensions
 -------------------------------
 
