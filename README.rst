@@ -2,7 +2,7 @@
 PyBPS
 =====
 
-PyBPS is a parametric simulation manager that provides a framework for running parametric simulation jobs in an efficient way.
+PyBPS is a simulation manager that provides a framework for running parametric simulation jobs in an efficient way.
 It includes modules to:
 
 * **Pre-process parametric simulation jobs** (prepare simulation input files with a specific set of paramaters)
@@ -30,7 +30,7 @@ To install PyBPS, use pip::
 Configuration
 =============
 
-Prior to using PyBPS, you first have to configure simulation tools options in *pybps/config.ini*
+Prior to using PyBPS, you first have to configure simulation tools options in the ``config.ini`` file located at the root of the ``pybps`` directory.
 
 Currently, PyBPS works with the following building performance simulation tools:
 
@@ -42,7 +42,7 @@ Most of the configuration options should be left to their default value. However
 
 * Simulation tool installation directory
 
-    *Install_Dir = C:\TRNSYS*
+    *Install_Dir = C:/TRNSYS*
 	
 * Extensions of simulation result files
 
@@ -63,6 +63,23 @@ Most of the configuration options should be left to their default value. However
 	
 Usage
 =====
+
+Shell Script
+------------
+
+The simplest way to start using PyBPS is by way of the shell script.
+
+Just open a command line window and type ``pybps-script.py`` followed by the path to the BPS project directory. It should look like this::
+
+    pybps-script.py C:/My_BPS_Project/
+	
+The script accepts optional arguments to control the number of local processors to be used in simulation run and to calculate to total execution time. For example, calling the script with the following arguments will limit to 2 processors and give the batch execution run time::
+
+    pybps-script.py --ncore 2 --stopwatch C:/My_BPS_Project/
+	
+	
+Package
+-------
 
 To get started, it is necessary to import the ``BPSProject`` class definition::
 
@@ -92,12 +109,11 @@ A particular job can be manage using the following methods::
 	
 The decision of which result and log files should be copied to the *Results* directory depends on the files extensions specified in the *ResultFile_Extensions* and *LogFile_Extensions* keywords of the ``config.ini`` file.
 	
-In general, it is more common to want to run all simulation jobs at once. 
+In general, it is more common to run all simulation jobs at once. 
 Calling the ``run`` method without arguments launches simulation jobs in parallel using all available processors::
 
 	bpsproj.run()
 	
-
 When all simulation jobs have been run, all of the information related to the current simulation project (job parameters, results and run summaries) can be stored in ``pandas`` DataFrames::
 	
 	bpsproj.jobs2df()
@@ -109,6 +125,7 @@ Once our simulation project data is in DataFrames, it can be stored in an SQlite
 	bpsproj.save2db()
 	bpsproj.save2csv()
 	
+
 	
 License
 =======
