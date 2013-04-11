@@ -2,11 +2,10 @@
 License
 =======
 
-parabuis is distributed under a 3-clause ("Modified" or "New") BSD
-license.
+PyBPS is distributed under a 3-clause ("Modified" or "New") BSD license.
 
 
-parabuis license
+PyBPS license
 ================
 
 Copyright (c) 2012-2013, Sistemes Avançats d'Energia Solar Tèrmica, SCCL
