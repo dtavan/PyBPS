@@ -15,7 +15,8 @@ It includes modules to:
 
 * **Produce a simulation run summary**, including execution times of all simulated jobs, warnings and errors.
 
-The package uses ``pandas`` DataFrames to handle data, which opens a lot of possibilities in terms of data analysis. Users can therefore leverage all of the power of the ``pandas`` package to analyze simulation results.
+The package uses ``pandas`` DataFrames to handle data, which opens a lot of possibilities in terms of data analysis. 
+Users can therefore leverage all of the power of the ``pandas`` package to analyze simulation results.
 Using ``pandas`` also makes it very straightforward to plot results using the ``matplotlib`` package.
 
 
@@ -61,6 +62,40 @@ Most of the configuration options should be left to their default value. However
     *SampleFile_SearchString = _Sample*
 
 	
+Prerequisites
+=============
+
+In addition to the necessary configuration options commented above, there is also a set of specific requirements that the building simulation project should comply with for PyBPS to work properly. 
+
+Template Files
+--------------
+
+Template files have to be properly identified by putting the search string specified in ``config.ini`` in their filename. 
+For example, the template file for the ``3Dbuilding.dck`` project would be ``3Dbuilding_Template.dck``.
+
+To properly work as a template file, it should contain parameter search strings in place of actual parameters that should be replaced by PyBPS in each simulation job.
+**It is a requirement of PyBPS that all parameter search strings should be strings of characters between % signs.** 
+Valid parameter search strings would look like::
+
+    %ORIENTATION%  # Valid search string for ORIENTATION parameter
+    %HEAT_SETPOINT% # Valid search string for HEAT_SETPOINT parameter
+	
+Sample File
+-----------
+
+For every single parameter search string defined in the template files, there should be a corresponding column with values in the sample file.
+
+Sample files should always be CSV files and be properly identified by putting the search string specified in ``config.ini`` in their filename.
+For example, the sample file for the ``3Dbuilding.dck`` project would be ``3Dbuilding_Sample.csv`` and would contain the following information::
+
+    ORIENTATION,HEAT_SETPOINT
+    0,20
+    0,21
+    180,20
+    180,21
+    ...
+	
+	
 Usage
 =====
 
@@ -73,7 +108,8 @@ Just open a command line window and type ``pybps-script.py`` followed by the pat
 
     pybps-script.py C:/My_BPS_Project/
 	
-The script accepts optional arguments to control the number of local processors to be used in simulation run and to calculate to total execution time. For example, calling the script with the following arguments will limit to 2 processors and give the batch execution run time::
+The script accepts optional arguments to control the number of local processors to be used in simulation run and to calculate to total execution time. 
+For example, calling the script with the following arguments will limit to 2 processors and give the batch execution run time::
 
     pybps-script.py --ncore 2 --stopwatch C:/My_BPS_Project/
 	
