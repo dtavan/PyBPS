@@ -16,10 +16,10 @@ import pandas as pd
 from pandas.io import sql
 
 from pybps import util
-from pybps.preprocess import trnsys_pre
-from pybps.preprocess import daysim_pre
-from pybps.postprocess import trnsys_post
-from pybps.postprocess import daysim_post
+from pybps.preprocess import trnsys as trnsys_pre
+from pybps.preprocess import daysim as daysim_pre
+from pybps.postprocess import trnsys as trnsys_post
+from pybps.postprocess import daysim as daysim_post
 
 
 
