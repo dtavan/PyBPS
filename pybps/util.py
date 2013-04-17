@@ -163,7 +163,7 @@ def dict_cleanconvert(dict):
             dict[key] = dict[key].strip()
         # Remove unwanted whitespace also in dict keys
         if any(key):
-            if dict[key.strip()] != dict[key]:
+            if key != key.strip():
                 dict[key.strip()] = dict[key]
                 del dict[key]
         # Remove empty dict keys (and corresponding values)
