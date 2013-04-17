@@ -25,20 +25,20 @@ def gen_type56(model_abspath, select='all'):
     with open(model_abspath, 'rU') as m_f:
         temp = m_f.read()
         match = pattern.search(temp)
+        # TRNBUILD is only called if Type56 is found in deck file.
         if match:
             b17_relpath = match.group(1)
-    if b17_relpath:
-        b17_abspath = os.path.join(os.path.dirname(model_abspath), b17_relpath)
-        # Generate shading/insolation matrix
-        if select == 'all' or select == 'matrices' or select == 'masks':
-            cmd = [trnbuild_path, b17_abspath, '/N', '/masks']
-            util.run_cmd(cmd)
-        # Generate view factor matrix
-        if select == 'all' or select == 'matrices' or select == 'vfm':					
-            cmd = [trnbuild_path, b17_abspath, '/N', '/vfm']
-            util.run_cmd(cmd)
-        # Generate trnsys3D idf file, to view geometry in Sketchup
-        if select == 'all' or select == 'idf':				
-            cmd = [trnsidf_path, b17_abspath]
-            util.run_cmd(cmd)
+            b17_abspath = os.path.join(os.path.dirname(model_abspath), b17_relpath)
+            # Generate shading/insolation matrix
+            if select == 'all' or select == 'matrices' or select == 'masks':
+                cmd = [trnbuild_path, b17_abspath, '/N', '/masks']
+                util.run_cmd(cmd)
+            # Generate view factor matrix
+            if select == 'all' or select == 'matrices' or select == 'vfm':					
+                cmd = [trnbuild_path, b17_abspath, '/N', '/vfm']
+                util.run_cmd(cmd)
+            # Generate trnsys3D idf file, to view geometry in Sketchup
+            if select == 'all' or select == 'idf':				
+                cmd = [trnsidf_path, b17_abspath]
+                util.run_cmd(cmd)
 

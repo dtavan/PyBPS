@@ -272,19 +272,23 @@ class BPSProject(object):
                         model_relpathlist[i] = relpath
                 # If more than 1 model file found, ask user to select 1 model
                 if len(model_relpathlist) > 1:
-                    print('\nVarious model files found in directory' +
-                        '\nPlease select model(s) to be used in current run:')
-                    print("(%d) %s" % (0, 'all models'))
-                    for i, path in enumerate(model_relpathlist):
-                        print("(%d) %s" % (i+1, os.path.splitext(
-                            os.path.basename(path))[0]))
-                    select = int(raw_input("Model ID number: "))
-                    if select == 0:
-                        self.model_relpath = model_relpathlist
-                        print('You selected all models')
+                    if (len(model_relpathlist) == 2 and 
+                           model_relpathlist[0] == model_relpathlist[1]):
+                        self.model_relpath = model_relpathlist[0]
                     else:
-                        self.model_relpath = model_relpathlist[select - 1]
-                        print("You selected %s" % self.model_relpath)
+                        print('\nVarious model files found in directory' +
+                            '\nPlease select model to be used in current run:')
+                        print("(%d) %s" % (0, 'all models'))
+                        for i, path in enumerate(model_relpathlist):
+                            print("(%d) %s" % (i+1, os.path.splitext(
+                                os.path.basename(path))[0]))
+                        select = int(raw_input("Model ID number: "))
+                        if select == 0:
+                            self.model_relpath = model_relpathlist
+                            print('You selected all models')
+                        else:
+                            self.model_relpath = model_relpathlist[select - 1]
+                            print("You selected %s" % self.model_relpath)
                 else:
                     self.model_relpath = model_relpathlist[0]
                 found += 1
@@ -446,18 +450,21 @@ class BPSProject(object):
                             results_abspath))[1] == '.htm'):
                             dict_list = daysim_post.parse_el_lighting(
                                             results_abspath)
-                    for dict in dict_list:
-                        dict['JobID'] = match.group()
-                    colnames = dict_list[0].keys()
-                    colnames.sort(key = sort_key_dfcolnames)
-                    if not df_exists:
-                        self.results_df = pd.DataFrame(dict_list, 
+                    if dict_list:
+                        for dict in dict_list:
+                            dict['JobID'] = match.group()
+                        colnames = dict_list[0].keys()
+                        colnames.sort(key = sort_key_dfcolnames)
+                        if not df_exists:
+                            self.results_df = pd.DataFrame(dict_list, 
                                               columns=colnames)
-                        df_exists = True
+                            df_exists = True
+                        else:
+                            df = pd.DataFrame(dict_list, columns=colnames)
+                            self.results_df = self.results_df.append(df, 
+                                                  ignore_index=True)
                     else:
-                        df = pd.DataFrame(dict_list, columns=colnames)
-                        self.results_df = self.results_df.append(df, 
-                                              ignore_index=True)
+                        print("No results dataframe created")                    
 		 
 	
     def save2db(self, items='all'):
