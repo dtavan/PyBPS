@@ -57,10 +57,12 @@ class BPSProject(object):
     Comment
     """
 	
-    def __init__(self, path=None):
+    def __init__(self, path=None, validCheck=True):
         # Create a unique id to identify current serie of job runs
         self.seriesID = util.random_str(8)
         print("\nBatch Series ID: %s" % self.seriesID)
+        # A flag to enable or disable validity checking
+        self.valid_check = validCheck
         # Simulation tool to be used
         self.simtool = None 
         # Config info for detected simulation tool		
@@ -165,7 +167,7 @@ class BPSProject(object):
                 " from database")
 	
 	
-    def get_parameterlist(self, src):
+    def get_parameterlist(self, src, tmp_relpathlist=[]):
         """Returns parameter list from sample or template files.
         
         Parameter list is returned sorted after eliminating duplicates.
@@ -174,10 +176,10 @@ class BPSProject(object):
         if src == 'sample':
             self.samp_params = self.sample[0].keys()
             self.samp_params.sort()
-        elif src == 'templatefiles':
+        elif src == 'tempfile':
             pattern = re.compile(r'%(.*?)%')
             self.temp_params = []
-            for temp_relpath in self.temp_relpaths:
+            for temp_relpath in tmp_relpathlist:
                 # Open jobs file
                 temp_abspath = os.path.join(self.abspath, temp_relpath)
                 with open(temp_abspath, 'rU') as tmp_f:
@@ -208,10 +210,10 @@ class BPSProject(object):
         # Then, add jobs
         if self._batch:
             njob = len(self.sample)
-            if self.temp_relpaths:
-                # Get list of all parameters found in template files
-                self.get_parameterlist('templatefiles')
-                self.get_parameterlist('sample')
+            # Get list of all parameters found in template files
+            self.get_parameterlist('tempfile', self.temp_relpaths)
+            self.get_parameterlist('sample')
+            if self.valid_check == True:
                 # Check if template files and jobs file contain the same list
                 # of parameters. Raise an error if not
                 if set(self.temp_params).issubset(self.samp_params):
@@ -335,11 +337,11 @@ class BPSProject(object):
         
         #Create executable path for selected simulation tool
         if self.simtool == 'TRNSYS':
-            executable_abspath = os.path.abspath(self.config['trnexe_path'])
+            executable_abspath = self.config['trnexe_path']
             silent_flag = '/h'
             nostop_flag = '/n'
         elif self.simtool == 'DAYSIM':
-            executable_abspath = os.path.abspath(self.config['exe_path'])
+            executable_abspath = self.config['exe_path']
             silent_flag = ''
             nostop_flag = ''            
 		
