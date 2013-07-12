@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name = 'pybps',
-    version = '0.1.1',
+    version = '0.1.2',
     description = 'A parametric simulation manager for building performance simulation projects',
     long_description = open('README.rst').read(),
     classifiers = [

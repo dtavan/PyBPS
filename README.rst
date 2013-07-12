@@ -33,6 +33,8 @@ Configuration
 
 Prior to using PyBPS, you first have to configure simulation tools options in the ``config.ini`` file located at the root of the ``pybps`` directory (usually ``\C:\Python27\Lib\site-packages\pybps``).
 
+Alternatively, you can also include a ``config.ini`` file in your project directory with a project specific configuration. PyBPS will override default configuration settings whenever a custom ``config.ini`` file is found in the project directory.
+
 Currently, PyBPS works on Windows with the following building performance simulation tools:
 
 * `TRNSYS v17 <http://trnsys.com>`_
