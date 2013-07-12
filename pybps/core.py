@@ -311,6 +311,11 @@ class BPSProject(object):
         conf = SafeConfigParser()
         conf_file = os.path.join(os.path.abspath(os.path.dirname(__file__)),
             'config.ini')
+        for file in os.listdir(self.abspath):
+            if file.endswith('config.ini'):
+                conf_file = os.path.join(self.abspath, file)
+                print('Custom ' + file + ' config file will ' + 
+                    'be used instead of default config.ini')
         conf.read(conf_file)
         sections = conf.sections()
 		
