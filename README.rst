@@ -27,6 +27,12 @@ To install PyBPS, use pip::
 
     pip install pybps
 	
+If you have an earlier version of PyBPS already installed that you want to upgrade, just use::
+
+    pip install pybps --upgrade
+	
+This will also upgrade PyBPS dependencies.
+	
 	
 Configuration
 =============
