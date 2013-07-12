@@ -277,14 +277,14 @@ class BPSProject(object):
                 # Check if template files and jobs file contain the same list
                 # of parameters. Raise an error if not
                 if set(self.temp_params).issubset(self.samp_params):
-                    for jobID in range(1, njob+1):
+                    for jobID in range(startJobID, startJobID + njob):
                         self.jobs.append(BPSJob(self, jobID))
                     print("\n%d jobs added to BPSProject instance" % njob)
                 else:
                     print("\nMismatch between template and sample file" + 
                         " parameters!\nNo jobs added to BPSproject instance")
             else:
-                for jobID in range(1, njob+1):
+                for jobID in (startJobID, startJobID + njob):
                     self.jobs.append(BPSJob(self, jobID))
                 print("\n%d jobs added to BPSProject instance" % njob)              			
         else:
@@ -507,7 +507,7 @@ class BPSProject(object):
         jobdict_list = []
         for job in self.jobs:
             jobdict = deepcopy(job.jobdict)
-            jobdict['JobID'] = job.seriesID + '_' + '%0*d' % (5,job.jobID)
+            jobdict['JobID'] = job.seriesID + '_' + job.jobID
             jobdict_list.append(jobdict)
         colnames = jobdict_list[0].keys()
         colnames.sort(key = sort_key_dfcolnames)
@@ -665,7 +665,7 @@ class BPSJob(BPSProject):
     def __init__(self, bpsproject, jobID):
         #BPSProject.__init__(self, path=None, batch=True)
         # Define variables specific to BPSJob class instances
-        self.jobID = jobID # ID of current job run	
+        self.jobID = '%0*d' % (5, jobID) # ID of current job run	
         self.runsumdict = {} # Run summary dict
         self.simtime = 0 # Simulation run time
         # Define basic instance variables from main BPSProject class instance
@@ -675,7 +675,7 @@ class BPSJob(BPSProject):
         self.jobdict = bpsproject.sample[jobID-1]
         self.base_abspath = bpsproject.abspath
         self.abspath = os.path.join(bpsproject.jobsdir_abspath, self.seriesID +
-                          '_' + '%0*d' % (5, self.jobID))
+                          '_' + self.jobID)
         self.resultsdir_abspath = bpsproject.resultsdir_abspath
         self.model_relpath = self.jobdict['ModelFile']
         # The following instance variables are used only if project
@@ -788,12 +788,12 @@ class BPSJob(BPSProject):
             self.runsumdict = trnsys_post.parse_log(log_abspath)
 	
         # Save jobID and simulation time in run summary dict
-        self.runsumdict['JobID'] = self.seriesID + '_' + '%0*d' % (5, self.jobID)
+        self.runsumdict['JobID'] = self.seriesID + '_' + self.jobID
         self.runsumdict['SimulTime(sec)'] = self.simtime
 	
         # Create a subfolder in main results folder to store simulation results
         simresdir_abspath = os.path.join(self.resultsdir_abspath, 
-                             self.seriesID + '_' + '%0*d' % (5, self.jobID))
+                             self.seriesID + '_' + self.jobID)
         util.tmp_dir('create', simresdir_abspath)
 				
         # Get extensions of results files
