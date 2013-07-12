@@ -763,9 +763,9 @@ class BPSJob(BPSProject):
             # If simtool is TRNSYS, generate TRNBUILD shading/insolation, 
             # view factor matrices and IDF file corresponding to .b17 file
             if self.simtool == 'TRNSYS':
-                wait_t = uniform(0,3)
+                #wait_t = uniform(0,3)
                 #print("Waiting %.2f seconds before calling TRNBUILD" % wait_t)
-                sleep(wait_t)
+                #sleep(wait_t)
                 model_abspath = os.path.join(self.abspath, self.model_relpath)
                 trnsys_pre.gen_type56(model_abspath)
             # If simtool is DAYSIM, rotate scene and generate material and
