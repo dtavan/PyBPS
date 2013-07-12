@@ -33,7 +33,7 @@ def run_job(job):
     
     """
 	
-    print("Running simulation job %d ..." % job.jobID)
+    print("Running simulation job %s ..." % job.jobID)
     job.prepare()
     job.preprocess()
     job.run()
@@ -277,14 +277,14 @@ class BPSProject(object):
                 # Check if template files and jobs file contain the same list
                 # of parameters. Raise an error if not
                 if set(self.temp_params).issubset(self.samp_params):
-                    for jobID in range(startJobID, startJobID + njob):
+                    for jobID in range(self.startJobID, self.startJobID + njob):
                         self.jobs.append(BPSJob(self, jobID))
                     print("\n%d jobs added to BPSProject instance" % njob)
                 else:
                     print("\nMismatch between template and sample file" + 
                         " parameters!\nNo jobs added to BPSproject instance")
             else:
-                for jobID in (startJobID, startJobID + njob):
+                for jobID in (self.startJobID, self.startJobID + njob):
                     self.jobs.append(BPSJob(self, jobID))
                 print("\n%d jobs added to BPSProject instance" % njob)              			
         else:
