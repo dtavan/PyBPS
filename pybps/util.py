@@ -8,9 +8,15 @@ import re
 import csv
 import string
 import random
+import smtplib
+import zipfile
 from subprocess import check_call, STDOUT
 from tempfile import NamedTemporaryFile
 from shutil import rmtree
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+from email.MIMEBase import MIMEBase
+from email import Encoders
 
 
 def is_float(s):
@@ -193,3 +199,48 @@ def run_cmd(cmd, debug=False):
             check_call(cmd)
     except OSError:
         sys.stderr.write('Problem executing: ' + ' '.join(cmd))
+        
+        
+def zip(src, dst):
+    zf = zipfile.ZipFile("%s.zip" % (dst), "w")
+    abs_src = os.path.abspath(src)
+    for dirname, subdirs, files in os.walk(src):
+        for filename in files:
+            if filename.endswith('csv') or filename.endswith('db'):
+                absname = os.path.abspath(os.path.join(dirname, filename))
+                arcname = absname[len(abs_src) + 1:]
+                print 'zipping %s as %s' % (os.path.join(dirname, filename), arcname)
+                zf.write(absname, arcname)
+    zf.close()
+
+    
+def sendgmail(from_addr, to_addr_list, subject, message,
+              login, password, att_file=None, smtpserver='smtp.gmail.com:587'):
+    
+    # Build message
+    msg = MIMEMultipart()
+    msg['Subject'] = subject
+    msg['From'] = from_addr
+    msg['To'] = ','.join(to_addr_list)
+    msg.attach( MIMEText(message) )
+  
+    # Attach file
+    if att_file is not None:
+        part = MIMEBase('application', "octet-stream")
+        part.set_payload( open(att_file, 'rb').read() )
+        Encoders.encode_base64(part)
+        part.add_header('Content-Disposition', 'attachment; filename="%s"' % os.path.basename(att_file))
+        msg.attach(part)
+  
+    # Send email
+    server = smtplib.SMTP(smtpserver)
+    server.ehlo()
+    server.starttls()
+    server.ehlo()
+    server.login(login,password)
+    try:
+        server.sendmail(from_addr, to_addr_list, msg.as_string())
+        print ('email sent')
+    except:
+        print ('error sending mail')
+    server.quit()

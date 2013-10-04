@@ -93,11 +93,30 @@ def parse_el_lighting(file_abspath):
     
     with open(file_abspath, 'rU') as out_f:
         temp = out_f.read()
-        # Retrieve Daylight autonomy values
-        match = re.search(r'sensors lie between (\d+)% and (\d+)%', temp)
+        # Retrieve lighting power density value
+        match = re.search(r'installed lighting power density of (\d+\.\d+)', temp)
         if match: 
-            el_results['DA_inf'] = float(match.group(1))
-            el_results['DA_sup'] = float(match.group(2))
+            el_results['POWER_DENS'] = float(match.group(1))
+        # Retrieve minimum illuminance level value
+        match = re.search(r'minimum illuminance level of (\d+)', temp)
+        if match: 
+            el_results['MIN_ILL_LEV'] = float(match.group(1))
+        # Retrieve ballast lost factor value
+        match = re.search(r'ballast loss factor of (\d+)', temp)
+        if match: 
+            el_results['LOSS_FACTOR'] = float(match.group(1))
+        # Retrieve standby power value
+        match = re.search(r'standby power of (\d+\.\d+)', temp)
+        if match: 
+            el_results['STANDBY'] = float(match.group(1))
+        # Retrieve Daylight Factor values
+        match = re.search(r'\n(\d\.\d)</td>', temp)
+        if match: 
+            el_results['DF'] = float(match.group(1))
+        # Retrieve Daylight Autonomy values
+        match = re.search(r'The daylight autonomy for the core workplane sensor is (\d+)%', temp)
+        if match: 
+            el_results['DA'] = float(match.group(1))
         # Retrieve useful daylight autonomy for UDI < 100 lux
         match = re.search(r'UDI<sub><100</sub>=(\d+)%', temp)
         if match:

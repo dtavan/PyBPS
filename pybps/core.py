@@ -490,8 +490,9 @@ class BPSProject(object):
                 pool.join()
                 # Stop timer if stopwatch requested by user
                 if stopwatch == True:
+                    self.simtime = time()-start_time
                     print('\nSimulation batch runtime: ' + 
-                        str(time()-start_time) + ' seconds')	        
+                        str(self.simtime) + ' seconds')	        
 		    # Print an error message if no jobs were found
             else:
                 print("\nNo simulation jobs found" +
@@ -705,7 +706,7 @@ class BPSJob(BPSProject):
             copytree(self.base_abspath, self.abspath)
             
     
-    def preprocess(self):
+    def preprocess(self, pretool=False):
         """Preprocess simulation job
         
         Replaces parameters found in template files with values from sample.
@@ -714,6 +715,10 @@ class BPSJob(BPSProject):
             necessary matrices for the 3D model.
         When using DAYSIM simulation tool, if the scene rotation angel is
             different from zero, the "rotate_scene" function is called.
+        Args:
+            pretool: if True, activates tool-specific preprocessing
+                For example, matrix generation for TRNSYS Type56 or
+                scene rotation for DAYSIM
         
         """
             
@@ -759,21 +764,22 @@ class BPSJob(BPSProject):
                     os.remove(temp_abspath)
                 except:
                     print("Exception: ", str(sys.exc_info()))            
-			
-            # If simtool is TRNSYS, generate TRNBUILD shading/insolation, 
-            # view factor matrices and IDF file corresponding to .b17 file
-            if self.simtool == 'TRNSYS':
-                #wait_t = uniform(0,3)
-                #print("Waiting %.2f seconds before calling TRNBUILD" % wait_t)
-                #sleep(wait_t)
-                model_abspath = os.path.join(self.abspath, self.model_relpath)
-                trnsys_pre.gen_type56(model_abspath)
-            # If simtool is DAYSIM, rotate scene and generate material and
-            # geometry radiance files required by Daysim
-            if self.simtool == 'DAYSIM':
-                model_abspath = os.path.join(self.abspath, self.model_relpath)
-                daysim_pre.rotate_scene(model_abspath)
-                daysim_pre.radfiles2daysim(model_abspath)
+			    
+            if pretool == True:
+                # If simtool is TRNSYS, generate TRNBUILD shading/insolation, 
+                # view factor matrices and IDF file corresponding to .b17 file
+                if self.simtool == 'TRNSYS':
+                    #wait_t = uniform(0,3)
+                    #print("Waiting %.2f seconds before calling TRNBUILD" % wait_t)
+                    #sleep(wait_t)
+                    model_abspath = os.path.join(self.abspath, self.model_relpath)
+                    trnsys_pre.gen_type56(model_abspath)
+                # If simtool is DAYSIM, rotate scene and generate material and
+                # geometry radiance files required by Daysim
+                if self.simtool == 'DAYSIM':
+                    model_abspath = os.path.join(self.abspath, self.model_relpath)
+                    daysim_pre.rotate_scene(model_abspath)
+                    daysim_pre.radfiles2daysim(model_abspath)
 			
 
     def close(self):
