@@ -1,3 +1,5 @@
+.DS_Store
+
 #############
 ## Python
 #############
@@ -36,3 +38,7 @@ nosetests.xml
 .mr.developer.cfg
 .project
 .pydevproject
+
+# IPython Notebooks
+.ipynb_checkpoints
+
