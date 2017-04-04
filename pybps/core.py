@@ -26,27 +26,27 @@ import pybps.postprocess.daysim as daysim_post
 def run_job(job):
     """Prepare, Preprocess, Run and Close a BPSJob
     This function is called by the multiprocessing.pool.map method
-    
+
     This function can be overridden by giving a new function to the
     self.runjob_func variable. However, the argument should always be "job"
     and the function should include methods from the BPSJob class.
-    
+
     """
-	
+
     print("Running simulation job %s ..." % job.jobID)
     job.prepare()
     job.preprocess()
     job.run()
     job.close()
-	
+
     return job.runsumdict
-	
-	
-	
+
+
+
 def sort_key_dfcolnames(x):
     """Sort key function for list of pandas DataFrame column names.
     Used to put 'JobID' column first in pandas DataFrame"""
-	
+
     if x == 'JobID':
         return (0, x)
     elif x == 'ModelFile':
@@ -55,16 +55,16 @@ def sort_key_dfcolnames(x):
         return (2, x)
     else:
         return (3, x)
-        
-	
-		
+
+
+
 class BPSProject(object):
     """Class that holds all information and methods to manage parametric
     building performance simulation projects"""
-	
+
     def __init__(self, path=None, validCheck=True, seriesID='random', startJobID=1):
         """Initialization of BPSProject Class
-        
+
         Args:
             path: relative or absolute path to simulation project directory.
                If not defined here, the "set_projpath" method should be used.
@@ -73,7 +73,7 @@ class BPSProject(object):
                However, the user can force the seriesID using this arg.
             startJobID: by default, the start ID for jobs is 1, but this can
                be overridden by giving any start number to this arg.
-        
+
         """
         # Create a unique id to identify current serie of job runs
         if seriesID == 'random':
@@ -86,8 +86,8 @@ class BPSProject(object):
         # A flag to enable or disable validity checking
         self.valid_check = validCheck
         # Simulation tool to be used
-        self.simtool = None 
-        # Config info for detected simulation tool		
+        self.simtool = None
+        # Config info for detected simulation tool
         self.config = {}
         # Variable that holds the name of the 'run_jobs' function to be used
         self.runjob_func = run_job
@@ -97,7 +97,7 @@ class BPSProject(object):
         self.simtime = 0
         # Relative path to model file to be used in current run
         self.model_relpath = None
-        # List of jobs to be run		
+        # List of jobs to be run
         self.jobs = []
         # List of dicts containing run summaries for all jobs
         self.runsummary = []
@@ -113,14 +113,14 @@ class BPSProject(object):
         self.resultscsv_name = 'SimResults.csv'
         # Name of run summary csv file
         self.runsumcsv_name = 'RunSummary.csv'
-        # List of relative paths to template simulation files		
+        # List of relative paths to template simulation files
         self.temp_relpaths = []
         # List of parameters found in template files
         self.temp_params = []
-        # Relative path to csv file containing list of jobs to be run		
+        # Relative path to csv file containing list of jobs to be run
         self.samp_relpath = None
         # List of parameters found in sample file
-        self.samp_params = []	
+        self.samp_params = []
         # Raw sample extracted from csv file. It's a list of dicts with
         # each dict holding all parameter for a particular job
         self.sample = []
@@ -138,44 +138,44 @@ class BPSProject(object):
             self.check()
         else:
             self.abspath = []
-			
-			
+
+
     def set_projpath(self, path):
         """Define path to simulation project directory
-        
+
         Args:
             path: relative or absolute path to simulation project directory.
-        
+
         """
-		
+
         self.abspath = os.path.abspath(path)
         print("\nBPS project directory: " + self.abspath)
         self.check()
-	
-		
+
+
     def get_sample(self, src='samplefile', seriesID=None):
         """Get sample from external source (csv file or sqlite database)
-        
+
         Args:
-            src: external source that contains sample, either 
+            src: external source that contains sample, either
                 - "samplefile" (in CSV format)
                 - "database" (PyBPS-generated SQlite format, NOT IMPLEMENTED!)
             seriesID: when getting sample from database, allows to specify the
                 seriesID of the sample (database can contain multiple samples)
-        
+
         """
-		
+
         # Empty any previously created jobs list
         self.sample = []
-		
+
         if src == 'samplefile':
 		    # Get information needed to find jobs file in folder
             samp_sstr = self.config['samplefile_searchstring']
             samp_abspathlist = util.get_file_paths([samp_sstr], self.abspath)
-            
+
             # Check if there is no more than 1 sample file in directory
             if len(samp_abspathlist) > 0:
-                samp_relpathlist = [os.path.relpath(fname, self.abspath) 
+                samp_relpathlist = [os.path.relpath(fname, self.abspath)
                                        for fname in samp_abspathlist]
                 if len(samp_relpathlist) > 1:
                     print('\nVarious sample files found in directory' +
@@ -185,7 +185,7 @@ class BPSProject(object):
                     select = int(raw_input("Sample ID number: "))
                     self.samp_relpath = samp_relpathlist[select - 1]
                     print("You selected %s" % self.samp_relpath)
-                else:					
+                else:
                     self.samp_relpath = samp_relpathlist[0]
                 # Build list of dicts with parameter values for all job runs
                 samp_abspath = os.path.join(self.abspath, self.samp_relpath)
@@ -193,27 +193,27 @@ class BPSProject(object):
                 # Add model and sample file names as parameters
                 for s in self.sample:
                     s['ModelFile'] = self.model_relpath
-                    s['SampleFile'] = self.samp_relpath					
+                    s['SampleFile'] = self.samp_relpath
             else:
                 sys.stderr.write("Could not find any sample file in " +
                     "project directory\nPlease put a \'" + samp_sstr +
-                    "\' file in directory and re-run 'get_sample' method\n")                
+                    "\' file in directory and re-run 'get_sample' method\n")
         elif src == 'database' and not seriesID:
             print("\nPlease provide a seriesID to retrieve parameter list" +
                 " from database")
-	
-	
+
+
     def get_parameterlist(self, src):
         """Returns list of parameters found in sample or template files.
-        
+
         Parameter list is returned sorted after eliminating duplicates.
-        
+
         Args:
             src: file to be searched, either "sample" or "tempfile"
-            
+
         Returns:
             Sorted list of parameters
-            
+
         """
 
         if src == 'sample':
@@ -233,31 +233,31 @@ class BPSProject(object):
                     self.temp_params.extend(pattern.findall(temp))
             # Remove duplicates, then sort list
             self.temp_params = list(set(self.temp_params))
-            self.temp_params.sort()     
+            self.temp_params.sort()
         else:
             print("Unrecognized argument.")
-	
-	
+
+
     def add_jobs(self):
         """Add simulation jobs to BPSProject
-        
-        Simulation jobs are created and added to BPSProject only when this 
+
+        Simulation jobs are created and added to BPSProject only when this
         function is called. This makes it possible to transform the sample
         loaded from an external source (done automatically when BPSProject
         class is initialized if a sample file is found in project directory)
         prior to creating and adding jobs to the BPSProject. This can come in
         handy is the variables in your sample differ from the parameters you
         need for your model.
-        
+
         Args:
             No args
-            
+
         Returns:
             Warning messages if sample parameters don't match parameters found
             in template files
-        
+
         """
-		
+
         # Create main directory for simulation jobs if it doesn't exists
         self.jobsdir_abspath = self.abspath + '_BATCH'
         util.tmp_dir('create', self.jobsdir_abspath)
@@ -281,32 +281,32 @@ class BPSProject(object):
                         self.jobs.append(BPSJob(self, jobID))
                     print("\n%d jobs added to BPSProject instance" % njob)
                 else:
-                    print("\nMismatch between template and sample file" + 
+                    print("\nMismatch between template and sample file" +
                         " parameters!\nNo jobs added to BPSproject instance")
             else:
                 for jobID in (self.startJobID, self.startJobID + njob):
                     self.jobs.append(BPSJob(self, jobID))
-                print("\n%d jobs added to BPSProject instance" % njob)              			
+                print("\n%d jobs added to BPSProject instance" % njob)
         else:
             print("\nBPS project not a batch run. Jobs can't be added")
-			
-			
+
+
     def check(self):
         """Check for simulation files in project directory
-        
+
         Checks whether the necessary files are found in the indicated project
         directory. Based on file extensions, simulation tool to be used is
         detected.
-        
+
         Args:
             No args
-            
+
         Returns:
             Warning messages if some important files are missing that make it
             impossible to run the parametric simulation project
-        
+
         """
-	
+
 	    # Get information from config file
         conf = SafeConfigParser()
         conf_file = os.path.join(os.path.abspath(os.path.dirname(__file__)),
@@ -314,11 +314,11 @@ class BPSProject(object):
         for file in os.listdir(self.abspath):
             if file.endswith('config.ini'):
                 conf_file = os.path.join(self.abspath, file)
-                print('Custom ' + file + ' config file will ' + 
+                print('Custom ' + file + ' config file will ' +
                     'be used instead of default config.ini')
         conf.read(conf_file)
         sections = conf.sections()
-		
+
         # Detect simulation tool used for current simulation job and check if
         # basic simulation input files are there
         found = 0 # Variable to store whether a simulation project was found
@@ -333,7 +333,7 @@ class BPSProject(object):
             if model_abspathlist:
                 model_relpathlist = [os.path.relpath(fname, self.abspath)
                                         for fname in model_abspathlist]
-                # If another simtool was already detected, raise an error            
+                # If another simtool was already detected, raise an error
                 if found > 0:
                     sys.stderr.write("\nInput files for different BPS " +
                         "tools found\nNo more than 1 kind of simulation " +
@@ -352,7 +352,7 @@ class BPSProject(object):
                         model_relpathlist[i] = relpath
                 # If more than 1 model file found, ask user to select 1 model
                 if len(model_relpathlist) > 1:
-                    if (len(model_relpathlist) == 2 and 
+                    if (len(model_relpathlist) == 2 and
                            model_relpathlist[0] == model_relpathlist[1]):
                         self.model_relpath = model_relpathlist[0]
                     else:
@@ -378,22 +378,22 @@ class BPSProject(object):
                 "folder\nPlease check the folder path is correct and " +
                 "simulation files are in given folder")
             sys.exit(1)
-				
+
         # Once simulation tool has been detected, store config info in 'config'
         items = conf.items(self.simtool)
         for (name, value) in items:
             self.config[name] = value
-				
+
 		# Once we have found a simulation project and stored config info,
-        # let's see if we can find a template file for this project	
+        # let's see if we can find a template file for this project
         tmpfile_sstr = self.config['templatefile_searchstring']
         temp_abspathlist = util.get_file_paths([tmpfile_sstr], self.abspath)
-        
+
         if temp_abspathlist:
             self._batch = True
-            self.temp_relpaths = [os.path.relpath(f_name, self.abspath) 
-                                     for f_name in temp_abspathlist]            
-	        # If template(s) found, check directory for sample file 
+            self.temp_relpaths = [os.path.relpath(f_name, self.abspath)
+                                     for f_name in temp_abspathlist]
+	        # If template(s) found, check directory for sample file
             self.get_sample()
         # Identify project as batch run if user selected to run all models
         elif len(self.model_relpath) > 1:
@@ -404,34 +404,34 @@ class BPSProject(object):
             for i,(m,s) in enumerate(zip(self.model_relpath,self.samp_relpath)):
                 self.sample.append({})
                 self.sample[i]['ModelFile'] = m
-                self.sample[i]['SampleFile'] = s				
+                self.sample[i]['SampleFile'] = s
 		# If no template file was found, give message to user
         else:
             print("No template found. BPS project identified as single run")
-			
-        
+
+
     def run(self, ncore='max', stopwatch=False, run_mode='silent', debug=False):
         """Run simulation jobs
-        
+
         Args:
             ncore: number of local cores/threads to be used at a time
-               For ncore>=2, jobs will run in parallel. 
+               For ncore>=2, jobs will run in parallel.
                By default, all local cores are used to run jobs in parallel
             stopwatch: flag to activate a stopwatch that monitors job run time
             run_mode: for simulation tool that have this kind of command line
                flag, allows to run tools in silent or continuous mode
                For example, 'silent' runs TRNSYS with '/h' flag and
                'nostop' runs TRNSYS with '/n' flag
-            debug: by default, simulation tool's standard output is captured 
-               and therefore does not appear on screens. if debug is set to 
-               'True' any output text return by the simuation tool is printed 
+            debug: by default, simulation tool's standard output is captured
+               and therefore does not appear on screens. if debug is set to
+               'True' any output text return by the simuation tool is printed
                (useful for debuggingsimulation model)
-               
+
         Returns:
             Info message for current simulation job run
-        
+
         """
-        
+
         #Create executable path for selected simulation tool
         if self.simtool == 'TRNSYS':
             executable_abspath = self.config['trnexe_path']
@@ -440,13 +440,13 @@ class BPSProject(object):
         elif self.simtool == 'DAYSIM':
             executable_abspath = self.config['exe_path']
             silent_flag = ''
-            nostop_flag = ''            
-		
+            nostop_flag = ''
+
         # If simulation project is identified as single run, directly
         # call simulation tool to run simulation
         if self._batch == False:
             # Build absolute path to model file
-            model_abspath = os.path.join(self.abspath, self.model_relpath)		
+            model_abspath = os.path.join(self.abspath, self.model_relpath)
             # Run the simulation, by default in silent mode
             if run_mode == 'silent': flag = silent_flag
             elif run_mode == 'nostop': flag = nostop_flag
@@ -469,11 +469,11 @@ class BPSProject(object):
                 print('\nStarting batch run ...')
                 # Start timer if stopwatch requested by user
                 if stopwatch == True:
-                    start_time = time()			
+                    start_time = time()
                 # Create multiprocessing pool for parallel subprocess run
                 if ncore == 'max':
                     pool = Pool(None)
-                    print(str(cpu_count()) + 
+                    print(str(cpu_count()) +
                         ' core(s) used in current run (max local cores)\n')
                 else:
                     pool = Pool(ncore)
@@ -491,15 +491,15 @@ class BPSProject(object):
                 # Stop timer if stopwatch requested by user
                 if stopwatch == True:
                     self.simtime = time()-start_time
-                    print('\nSimulation batch runtime: ' + 
-                        str(self.simtime) + ' seconds')	        
+                    print('\nSimulation batch runtime: ' +
+                        str(self.simtime) + ' seconds')
 		    # Print an error message if no jobs were found
             else:
                 print("\nNo simulation jobs found" +
                 "\n\nYou should first add simulation jobs to your BPSProject" +
                 "with the 'add_job' or " +
                 "\n'add_jobs' methods prior to calling the 'run' method")
-		
+
 
     def jobs2df(self):
         """Create pandas DataFrame from sample"""
@@ -514,28 +514,28 @@ class BPSProject(object):
         colnames.sort(key = sort_key_dfcolnames)
         self.jobs_df = pd.DataFrame(jobdict_list, columns=colnames)
 
-		
+
     def runsum2df(self):
         """Create pandas DataFrame from run summary"""
-		
+
         # Build a 'pandas' DataFrame with run summaries for all jobs
         colnames = ['JobID','Message','Warnings','Errors','SimulTime(sec)']
-        self.runsum_df = pd.DataFrame(self.runsummary, columns=colnames)        
-	
-											  
+        self.runsum_df = pd.DataFrame(self.runsummary, columns=colnames)
+
+
     def results2df(self):
         """Create pandas DataFrame from simulation results"""
 
         # Get extensions of results files
         results_ext = self.config['resultfile_extensions']
-        results_ext = results_ext.split(',')	
+        results_ext = results_ext.split(',')
         # Get list of paths to results files
-        results_abspathlist = util.get_file_paths(results_ext, 
+        results_abspathlist = util.get_file_paths(results_ext,
                                   self.resultsdir_abspath)
         # Go through all results files from all simulated jobs
         df_exists = False
         for results_abspath in results_abspathlist:
-            # Get Series/Job IDs 
+            # Get Series/Job IDs
             match = re.search(r'([A-Z0-9]{8})_[0-9]{5}', results_abspath)
             if match:
                 # Only parse results within sub-folders pertaining to
@@ -556,78 +556,75 @@ class BPSProject(object):
                         colnames = dict_list[0].keys()
                         colnames.sort(key = sort_key_dfcolnames)
                         if not df_exists:
-                            self.results_df = pd.DataFrame(dict_list, 
+                            self.results_df = pd.DataFrame(dict_list,
                                               columns=colnames)
                             df_exists = True
                         else:
                             df = pd.DataFrame(dict_list, columns=colnames)
-                            self.results_df = self.results_df.append(df, 
+                            self.results_df = self.results_df.append(df,
                                                   ignore_index=True)
                     else:
-                        print("No results dataframe created")                    
-		 
-	
+                        print("No results dataframe created")
+
+
     def save2db(self, items='all'):
         """Save project info to database
-        
+
         Args:
             items: 'jobs','results' and 'runsummary' respectively save jobs,
-                results or run summary to the database; 'all' saves everything            
-        
+                results or run summary to the database; 'all' saves everything
+
         """
-		
+
         db_abspath = os.path.join(self.resultsdir_abspath, self.db_name)
         cnx = sqlite3.connect(db_abspath)
-		
+
         if items == 'all' or items == 'jobs':
-            sql.write_frame(self.jobs_df, name='Jobs', con=cnx, 
-                if_exists='append')
-        if items == 'all' or items == 'results':		
-            sql.write_frame(self.results_df, name='Results', con=cnx, 
-                if_exists='append')
-        if items == 'all' or items == 'runsummary':		
-            sql.write_frame(self.runsum_df, name='RunSummary', con=cnx, 
-                if_exists='append')
+            self.jobs_df.to_sql(name='Jobs', con=cnx, if_exists='append')
+        if items == 'all' or items == 'results':
+            self.results_df.to_sql(name='Results', con=cnx, if_exists='append')
+        if items == 'all' or items == 'runsummary':
+            self.runsum_df.to_sql(name='RunSummary', con=cnx, if_exists='append')
 
         cnx.close()
 
 
     def save2csv(self, items='all'):
         """Save project info to database
-        
+
         Args:
             items: 'jobs','results' and 'runsummary' respectively save jobs,
-                results or run summary to the csv file; 'all' saves everything            
-        
+                results or run summary to the csv file; 'all' saves everything
+
         """
-		
-        jobscsv_abspath = os.path.join(self.resultsdir_abspath, 
+
+        jobscsv_abspath = os.path.join(self.resultsdir_abspath,
                               self.jobscsv_name)
-        resultscsv_abspath = os.path.join(self.resultsdir_abspath, 
+        resultscsv_abspath = os.path.join(self.resultsdir_abspath,
                                  self.resultscsv_name)
-        runsumcsv_abspath = os.path.join(self.resultsdir_abspath, 
+        runsumcsv_abspath = os.path.join(self.resultsdir_abspath,
                                 self.runsumcsv_name)
-		
+
         if items == 'all' or items == 'jobs':
             self.jobs_df.to_csv(jobscsv_abspath)
-        if items == 'all' or items == 'results':	
+        if items == 'all' or items == 'results':
             self.results_df.to_csv(resultscsv_abspath)
-        if items == 'all' or items == 'runsummary':	
+        if items == 'all' or items == 'runsummary':
             self.runsum_df.to_csv(runsumcsv_abspath)
 
-		
+
     def getfromdb_jobs(self, seriesID=None, db_name="SimResults.db"):
         """Get jobs from database
-        
+
         NOT IMPLEMENTED YET! DO NOT USE!
-        
+
         """
-		
+
         self.seriesID = seriesID
         self.db_abspath = os.path.join(self.resultsdir_abspath, db_name)
         cnx = sqlite3.connect(self.db_abspath)
         if self.seriesID:
-            sql_query = (r"SELECT * FROM Parameters WHERE _JOB_ID LIKE '%s%%'" 
+            sql_query = (r"SELECT * FROM Parameters WHERE _JOB_ID LIKE '%s%%'"
                             % seriesID)
         else:
             sql_query = r"SELECT * FROM Parameters"
@@ -635,38 +632,38 @@ class BPSProject(object):
         cnx.close()
         return parameters_df
 
-		
+
     def getfromdb_results(self, seriesID=None, month=None, db_name="SimResults.db"):
         """Get results from database
-        
+
         NOT IMPLEMENTED YET! DO NOT USE!
-        
+
         """
-		
+
         self.db_abspath = os.path.join(self.resultsdir_abspath, db_name)
         cnx = sqlite3.connect(self.db_abspath)
         if seriesID and month:
             sql_query = (r"SELECT * FROM Results WHERE (_JOB_ID LIKE '%s%%')" +
                             " AND (Month LIKE '%s')" % (seriesID, month))
         elif seriesID:
-            sql_query = (r"SELECT * FROM Results WHERE _JOB_ID LIKE '%s%%'" 
+            sql_query = (r"SELECT * FROM Results WHERE _JOB_ID LIKE '%s%%'"
                             % seriesID)
         else:
             sql_query = r"SELECT * FROM Results"
         results_df = sql.read_frame(sql_query, cnx)
         cnx.close()
         return results_df
-	
-		
+
+
 
 class BPSJob(BPSProject):
     """Class that holds all information and methods to manage a particular
     simulation job"""
-	
+
     def __init__(self, bpsproject, jobID):
         #BPSProject.__init__(self, path=None, batch=True)
         # Define variables specific to BPSJob class instances
-        self.jobID = '%0*d' % (5, jobID) # ID of current job run	
+        self.jobID = '%0*d' % (5, jobID) # ID of current job run
         self.runsumdict = {} # Run summary dict
         self.simtime = 0 # Simulation run time
         # Define basic instance variables from main BPSProject class instance
@@ -682,21 +679,21 @@ class BPSJob(BPSProject):
         # The following instance variables are used only if project
         # has template and sample files
         self.temp_params = bpsproject.temp_params
-        self.samp_params = bpsproject.samp_params	
+        self.samp_params = bpsproject.samp_params
         # IMPORTANT: instance of BPSJob class are by default identified
         # as single runs (self.batch = False).
         # The 'batch' instance variable MUST NOT BE CHANGED to 'True'!!!
         self._batch = False
 
-		
+
     def prepare(self):
         """Prepare simulation job
-        
+
         Prepares job by copying content of project folder to a temporary folder
         identified by a unique ID. Simulation job will be run from this folder.
-        
+
         """
-		
+
 		# Check whether a single model file has been selected
         if isinstance(self.model_relpath, list):
             print("Multiple model files selected for job run!" +
@@ -704,11 +701,11 @@ class BPSJob(BPSProject):
         else:
 	        # Create temp dir for current simulation job and copy files to it
             copytree(self.base_abspath, self.abspath)
-            
-    
+
+
     def preprocess(self, pretool=False):
         """Preprocess simulation job
-        
+
         Replaces parameters found in template files with values from sample.
         When using TRNSYS simulation tool, if a Type56 is found in deck,
             the "gen_type56" preprocessing function is called to generate the
@@ -719,36 +716,36 @@ class BPSJob(BPSProject):
             pretool: if True, activates tool-specific preprocessing
                 For example, matrix generation for TRNSYS Type56 or
                 scene rotation for DAYSIM
-        
+
         """
-            
+
 		# Following code only runs when project uses template/sample files
         if self.jobdict:
             # Get template file search string and look for them
-            tmp_sstr = self.config['templatefile_searchstring']	
+            tmp_sstr = self.config['templatefile_searchstring']
             temp_abspathlist = util.get_file_paths([tmp_sstr], self.abspath)
-	        # Once we have a list of paths to template files, loop through 
+	        # Once we have a list of paths to template files, loop through
             for temp_abspath in temp_abspathlist:
-                # Build name for simulation file 
+                # Build name for simulation file
                 #(same name as tmp, without search string)
-                match = re.search(r'(.*)' + tmp_sstr + r'(.*)', 
+                match = re.search(r'(.*)' + tmp_sstr + r'(.*)',
                             os.path.basename(temp_abspath))
                 if match:
                     siminput_abspath = os.path.join(
-                                           os.path.dirname(temp_abspath), 
+                                           os.path.dirname(temp_abspath),
                                            match.group(1) + match.group(2))
-                # Replace parameters with sample values in template file 
+                # Replace parameters with sample values in template file
                 with open(temp_abspath, 'rU') as tmp_f:
                     # Read the entire file and store it in a temp variable
                     temp = tmp_f.read()
                     # Find parameters to be replaced in template files and
                     # replace them
                     for p in self.temp_params:
-		                # If search string is found, replace with 
-                        # corresponding parameter value			
-                        temp = temp.replace('%' + p + '%', 
+		                # If search string is found, replace with
+                        # corresponding parameter value
+                        temp = temp.replace('%' + p + '%',
                                    str(self.jobdict[p]))
-                    # Replace special &PROJECT_DIR& var with cur dir path 
+                    # Replace special &PROJECT_DIR& var with cur dir path
                     temp = temp.replace('&PROJ_DIR&', str(self.abspath))
                     # Proper way to manage existing model files
                     if os.path.exists(siminput_abspath):
@@ -763,10 +760,10 @@ class BPSJob(BPSProject):
                 try:
                     os.remove(temp_abspath)
                 except:
-                    print("Exception: ", str(sys.exc_info()))            
-			    
+                    print("Exception: ", str(sys.exc_info()))
+
             if pretool == True:
-                # If simtool is TRNSYS, generate TRNBUILD shading/insolation, 
+                # If simtool is TRNSYS, generate TRNBUILD shading/insolation,
                 # view factor matrices and IDF file corresponding to .b17 file
                 if self.simtool == 'TRNSYS':
                     #wait_t = uniform(0,3)
@@ -780,37 +777,37 @@ class BPSJob(BPSProject):
                     model_abspath = os.path.join(self.abspath, self.model_relpath)
                     daysim_pre.rotate_scene(model_abspath)
                     daysim_pre.radfiles2daysim(model_abspath)
-			
+
 
     def close(self):
-        """Close job by copying result and log files to main results folder 
+        """Close job by copying result and log files to main results folder
         and delete temporary job folder"""
-	
+
         # Parse info about simulation run from TRNSYS lst and log files
         if self.simtool == 'TRNSYS':
             # Get TRNSYS error/warning count from log file
             log_fname = os.path.splitext(self.model_relpath)[0]+'.log'
             log_abspath = os.path.join(self.abspath, log_fname)
             self.runsumdict = trnsys_post.parse_log(log_abspath)
-	
+
         # Save jobID and simulation time in run summary dict
         self.runsumdict['JobID'] = self.seriesID + '_' + self.jobID
         self.runsumdict['SimulTime(sec)'] = self.simtime
-	
+
         # Create a subfolder in main results folder to store simulation results
-        simresdir_abspath = os.path.join(self.resultsdir_abspath, 
+        simresdir_abspath = os.path.join(self.resultsdir_abspath,
                              self.seriesID + '_' + self.jobID)
         util.tmp_dir('create', simresdir_abspath)
-				
+
         # Get extensions of results files
         results_ext = self.config['resultfile_extensions']
-        results_ext = results_ext.split(',')	
+        results_ext = results_ext.split(',')
         # Get list of paths to job results files
         jobresfile_abspathlist = util.get_file_paths(results_ext, self.abspath)
 	    # Copy job results files to simulation results folder
         for jobresfile_abspath in jobresfile_abspathlist:
             copy(jobresfile_abspath, simresdir_abspath)
-	
+
         # Get extensions of log files
         log_ext = self.config['logfile_extensions']
         log_ext = log_ext.split(',')
@@ -822,5 +819,3 @@ class BPSJob(BPSProject):
 
         # Remove temporary simulation folder
         util.tmp_dir('remove', self.abspath)
-	
-
