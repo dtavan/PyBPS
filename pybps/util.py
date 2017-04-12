@@ -2,6 +2,7 @@
 Miscellaneous utility functions
 """
 
+# Common imports
 import os
 import sys
 import re
@@ -15,8 +16,11 @@ from tempfile import NamedTemporaryFile
 from shutil import rmtree
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
-from email.MIMEBase import MIMEBase
-from email import Encoders
+from email import encoders
+
+# Handle Python 2/3 compatibility
+from six.moves import email_mime_base
+MIMEBase = email_mime_base.MIMEBase
 
 
 def is_float(s):
@@ -26,25 +30,25 @@ def is_float(s):
     except ValueError:
         return False
 
-		
+
 def is_int(s):
     try:
         int(s)
         return True
     except ValueError:
         return False
-	
-	
+
+
 def random_str(n):
     """Generates a random string of length n containing upper and lowercase
     letters and numbers"""
-    return "".join(random.choice(string.ascii_uppercase + string.digits) for x in xrange(n))     
+    return "".join(random.choice(string.ascii_uppercase + string.digits) for x in xrange(n))
 
-	
+
 def tmp_dir(action, tmp_dir):
-	"""Create/remove temporary folder.
+    """Create/remove temporary folder.
 
-    Creates or removes a temporary folder at the indicated path.	
+    Creates or removes a temporary folder at the indicated path.
 
     Args:
         action: either 'create' or 'remove' temporary folder.
@@ -52,28 +56,27 @@ def tmp_dir(action, tmp_dir):
 
     Returns:
         nothing
-		
+
     Raises:
         IOError: Exception:
     """
 
     # Create temporary folder
-        if action == 'create':
-            if not os.path.exists(tmp_dir):
-                try:
-                    os.mkdir(tmp_dir)
-                except:
-                    print("Exception: ", str(sys.exc_info()))
-
+    if action == 'create':
+        if not os.path.exists(tmp_dir):
+            try:
+                os.mkdir(tmp_dir)
+            except:
+                print("Exception: ", str(sys.exc_info()))
     # Remove temporary folder
-        elif action == 'remove':
-            if os.path.exists(tmp_dir):
-                try:
-                    rmtree(tmp_dir)
-                except:
-                    print("Exception: ", str(sys.exc_info()))
+    elif action == 'remove':
+        if os.path.exists(tmp_dir):
+            try:
+                rmtree(tmp_dir)
+            except:
+                print("Exception: ", str(sys.exc_info()))
 
-					
+
 def get_file_paths(pattern_list, dir):
     """Get paths to files with name following specified pattern.
 
@@ -84,9 +87,9 @@ def get_file_paths(pattern_list, dir):
     Returns:
         list of paths to files containing specified pattern.
     """
-	
+
     paths_list = []
-	
+
     for root, dirs, files in os.walk(dir):
         for name in files:
             for pattern in pattern_list:
@@ -96,10 +99,10 @@ def get_file_paths(pattern_list, dir):
 
     return paths_list
 
-	
+
 def csv2dict(csv_abspath):
     """Reads specified csv file and returns a list of dicts.
-    
+
     Each dict of the list contains parameter names (found in header) as keys
     and parameter values for a particular simulation as values.
 
@@ -112,7 +115,7 @@ def csv2dict(csv_abspath):
     Raises:
         IOError: problem reading file
     """
-	
+
     with open(csv_abspath, 'rb') as csv_f:
         csvdict = csv.DictReader(csv_f, delimiter=',')
         dict_list = list(csvdict)
@@ -137,7 +140,7 @@ def dict2csv(dict, csv_abspath, fieldnames=None):
     Raises:
         IOError: problem reading file
     """
-	
+
     with open(csv_abspath,'wb') as f: #Remember `newline=""` in Python 3.x
         if fieldnames:
             w = csv.DictWriter(f, fieldnames)
@@ -146,16 +149,16 @@ def dict2csv(dict, csv_abspath, fieldnames=None):
         w.writeheader()
         w.writerow(dict)
 
-        
+
 def dict_cleanconvert(dict):
     """Clean and convert dict keys and values.
-    
+
     Strips whitespaces from dict keys and values, convert string identified as
     numbers to float and removes empty dict keys and values.
 
     Args:
         dict: dict to cleaned.
-        
+
     Returns:
         Cleaned dict.
     """
@@ -175,10 +178,10 @@ def dict_cleanconvert(dict):
         # Remove empty dict keys (and corresponding values)
         else:
             del dict[key]
-		
+
     return dict
-        
-	
+
+
 def run_cmd(cmd, debug=False):
     """Run a shell command.
 
@@ -188,7 +191,7 @@ def run_cmd(cmd, debug=False):
     Raises:
         Problem executing: cmd
     """
-	
+
     try:
         if debug == False:
             with NamedTemporaryFile() as f:
@@ -199,8 +202,8 @@ def run_cmd(cmd, debug=False):
             check_call(cmd)
     except OSError:
         sys.stderr.write('Problem executing: ' + ' '.join(cmd))
-        
-        
+
+
 def zip(src, dst):
     zf = zipfile.ZipFile("%s.zip" % (dst), "w")
     abs_src = os.path.abspath(src)
@@ -209,29 +212,29 @@ def zip(src, dst):
             if filename.endswith('csv') or filename.endswith('db'):
                 absname = os.path.abspath(os.path.join(dirname, filename))
                 arcname = absname[len(abs_src) + 1:]
-                print 'zipping %s as %s' % (os.path.join(dirname, filename), arcname)
+                print('zipping {} as {}'.format(os.path.join(dirname, filename), arcname))
                 zf.write(absname, arcname)
     zf.close()
 
-    
+
 def sendgmail(from_addr, to_addr_list, subject, message,
               login, password, att_file=None, smtpserver='smtp.gmail.com:587'):
-    
+
     # Build message
     msg = MIMEMultipart()
     msg['Subject'] = subject
     msg['From'] = from_addr
     msg['To'] = ','.join(to_addr_list)
     msg.attach( MIMEText(message) )
-  
+
     # Attach file
     if att_file is not None:
         part = MIMEBase('application', "octet-stream")
         part.set_payload( open(att_file, 'rb').read() )
-        Encoders.encode_base64(part)
+        encoders.encode_base64(part)
         part.add_header('Content-Disposition', 'attachment; filename="%s"' % os.path.basename(att_file))
         msg.attach(part)
-  
+
     # Send email
     server = smtplib.SMTP(smtpserver)
     server.ehlo()

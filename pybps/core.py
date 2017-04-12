@@ -2,25 +2,36 @@
 Core classes and functions of the pybps package
 """
 
+# Common imports
 import os
 import sys
 import re
 import sqlite3
 from copy import deepcopy
-from ConfigParser import SafeConfigParser
 from multiprocessing import Pool, cpu_count, freeze_support
 from time import time, sleep
 from random import uniform
 from shutil import copy, copytree
+
+# Third-party imports
 import pandas as pd
 from pandas.io import sql
 
+# Custom imports
 from pybps import util
 import pybps.preprocess.trnsys as trnsys_pre
 import pybps.preprocess.daysim as daysim_pre
 import pybps.postprocess.trnsys as trnsys_post
 import pybps.postprocess.daysim as daysim_post
 
+# Handle Python 2/3 compatibility
+from six.moves import configparser
+import six
+
+if six.PY2:
+  ConfigParser = configparser.SafeConfigParser
+else:
+  ConfigParser = configparser.ConfigParser
 
 
 def run_job(job):
@@ -308,7 +319,7 @@ class BPSProject(object):
         """
 
 	    # Get information from config file
-        conf = SafeConfigParser()
+        conf = ConfigParser()
         conf_file = os.path.join(os.path.abspath(os.path.dirname(__file__)),
             'config.ini')
         for file in os.listdir(self.abspath):
