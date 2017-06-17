@@ -163,21 +163,13 @@ def dict_cleanconvert(dict):
         Cleaned dict.
     """
 
+    # Remove unwanted whitespaces in dict keys / values and remove empty keys
+    dict = {k.strip(): v.strip() for k, v in dict.items() if k}
+
+	# Convert all strings identified as numbers to float type
     for key in dict.keys():
-        # Convert all strings identified as numbers to float type
         if is_float(dict[key]):
             dict[key] = round(float(dict[key]), 3)
-        # Remove unwanted whitespaces in all other values
-        else:
-            dict[key] = dict[key].strip()
-        # Remove unwanted whitespace also in dict keys
-        if any(key):
-            if key != key.strip():
-                dict[key.strip()] = dict[key]
-                del dict[key]
-        # Remove empty dict keys (and corresponding values)
-        else:
-            del dict[key]
 
     return dict
 
