@@ -79,10 +79,11 @@ def parse_type46(file_abspath):
         fieldnames = dr.fieldnames
         dr_list = list(dr)
         dict_list = []
+        months_list = ['January','February','March','April','May','June','July','August','September','October','November','December']
         # Verify that the file is a valid Type46 output file
         if fieldnames[0].strip() == 'Month' or fieldnames[0].strip() == 'Period':
             # Check if the given file holds results integrated monthly
-            if dr_list[0][fieldnames[0]].strip() == 'January':
+            if dr_list[0][fieldnames[0]].strip() in months_list:
                 # Build a list of dict (one row from file = one dict)
                 for idx, row in enumerate(dr_list):
                     # Only append rows containing results and discard
