@@ -200,7 +200,8 @@ class BPSProject(object):
                     self.samp_relpath = samp_relpathlist[0]
                 # Build list of dicts with parameter values for all job runs
                 samp_abspath = os.path.join(self.abspath, self.samp_relpath)
-                self.sample = util.csv2dict(samp_abspath)
+                sample_data = pd.read_csv(samp_abspath)
+                self.sample = list(sample_data.transpose().to_dict().values())
                 # Add model and sample file names as parameters
                 for s in self.sample:
                     s['ModelFile'] = self.model_relpath

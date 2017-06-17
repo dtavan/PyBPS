@@ -100,56 +100,6 @@ def get_file_paths(pattern_list, dir):
     return paths_list
 
 
-def csv2dict(csv_abspath):
-    """Reads specified csv file and returns a list of dicts.
-
-    Each dict of the list contains parameter names (found in header) as keys
-    and parameter values for a particular simulation as values.
-
-    Args:
-        file_abspath: absolute path to csv file.
-
-    Returns:
-        list of dicts.
-
-    Raises:
-        IOError: problem reading file
-    """
-
-    with open(csv_abspath, 'rb') as csv_f:
-        csvdict = csv.DictReader(csv_f, delimiter=',')
-        dict_list = list(csvdict)
-    for dict in dict_list:
-        for k in dict.keys():
-            if is_float(dict[k]):
-                if is_int(dict[k]):
-                    dict[k] = int(dict[k])
-                else:
-                    dict[k] = float(dict[k])
-
-    return dict_list
-
-
-def dict2csv(dict, csv_abspath, fieldnames=None):
-    """Writes given dict to csv file at indicated path.
-
-    Args:
-        dict: dict to be written in csv file
-        csv_abspath: absolute path to output csv file.
-
-    Raises:
-        IOError: problem reading file
-    """
-
-    with open(csv_abspath,'wb') as f: #Remember `newline=""` in Python 3.x
-        if fieldnames:
-            w = csv.DictWriter(f, fieldnames)
-        else:
-            w = csv.DictWriter(f, dict.keys())
-        w.writeheader()
-        w.writerow(dict)
-
-
 def dict_cleanconvert(dict):
     """Clean and convert dict keys and values.
 
