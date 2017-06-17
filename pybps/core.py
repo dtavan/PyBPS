@@ -229,8 +229,7 @@ class BPSProject(object):
         """
 
         if src == 'sample':
-            self.samp_params = self.sample[0].keys()
-            self.samp_params.sort()
+            self.samp_params = sorted(self.sample[0].keys())
         elif src == 'tempfile':
             pattern = re.compile(r'%(.*?)%')
             self.temp_params = []
@@ -518,13 +517,12 @@ class BPSProject(object):
 
         # Build a 'pandas' DataFrame with all jobs parameters
         jobdict_list = []
+        jobsdf_index = []
         for job in self.jobs:
-            jobdict = deepcopy(job.jobdict)
-            jobdict['JobID'] = job.seriesID + '_' + job.jobID
-            jobdict_list.append(jobdict)
-        colnames = jobdict_list[0].keys()
-        colnames.sort(key = sort_key_dfcolnames)
-        self.jobs_df = pd.DataFrame(jobdict_list, columns=colnames)
+            jobsdf_index.append(job.seriesID + '_' + job.jobID)
+            jobdict_list.append(job.jobdict)
+        colnames = sorted(jobdict_list[0].keys())
+        self.jobs_df = pd.DataFrame(jobdict_list, columns=colnames, index=jobsdf_index)
 
 
     def runsum2df(self):
