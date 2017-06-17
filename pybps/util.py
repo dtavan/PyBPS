@@ -42,7 +42,7 @@ def is_int(s):
 def random_str(n):
     """Generates a random string of length n containing upper and lowercase
     letters and numbers"""
-    return "".join(random.choice(string.ascii_uppercase + string.digits) for x in xrange(n))
+    return "".join(random.choice(string.ascii_uppercase + string.digits) for x in range(n))
 
 
 def tmp_dir(action, tmp_dir):

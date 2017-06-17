@@ -100,7 +100,7 @@ def parse_type46(file_abspath):
 
         # Post-process generated list of dicts to remove unwanted whitespaced
         # and convert strings with numbers to float type
-        for dict in dict_list:
-            dict = dict_cleanconvert(dict)
+        for idx, item in enumerate(dict_list):
+            dict_list[idx] = dict_cleanconvert(dict_list[idx])
 
     return dict_list
