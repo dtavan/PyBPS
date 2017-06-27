@@ -2,6 +2,9 @@
 PyBPS
 =====
 
+.. image:: https://img.shields.io/badge/python-2.7-blue.svg   :target:
+.. image:: https://img.shields.io/badge/python-3.5-blue.svg   :target:
+
 PyBPS is a simulation manager that provides a framework for running parametric simulation jobs in an efficient way.
 It includes modules to:
 
@@ -15,7 +18,7 @@ It includes modules to:
 
 * **Produce a simulation run summary**, including execution times of all simulated jobs, warnings and errors.
 
-The package uses ``pandas`` DataFrames to handle data, which opens a lot of possibilities in terms of data analysis. 
+The package uses ``pandas`` DataFrames to handle data, which opens a lot of possibilities in terms of data analysis.
 Users can therefore leverage all of the power of the ``pandas`` package to analyze simulation results.
 Using ``pandas`` also makes it very straightforward to plot results using the ``matplotlib`` package.
 
@@ -25,15 +28,19 @@ Installation
 
 To install PyBPS, use pip::
 
-    pip install pybps
-	
+    $ pip install pybps
+
 If you have an earlier version of PyBPS already installed that you want to upgrade, just use::
 
-    pip install pybps --upgrade
-	
+    $ pip install pybps --upgrade
+
 This will also upgrade PyBPS dependencies.
-	
-	
+
+Additionally, you will need to install ``jupyter notebook`` and ``matplotlib`` to view and run the tutorial notebook
+
+    $ pip install jupyter matplotlib
+
+
 Configuration
 =============
 
@@ -58,9 +65,9 @@ Simulation tool installation directory
 
     [DAYSIM]
     Install_Dir = C:\DAYSIM   # Default installation directory for DAYSIM
-    
+
 **IMPORTANT:** If your DAYSIM install directory is different from the one above, you will also have to modify the ``DAYSIMPATH`` in the batch script ``pybps_daysim-exe.bat`` found in ``C:\Python27\Scripts``
-	
+
 Simulation result file extensions
 ----------------------------------
 
@@ -75,7 +82,7 @@ Simulation result files are files that might require post-processing and that wi
 
 In the current version of PyBPS, when working with TRNSYS, for the simulation results to be parsed automatically you must output monthly integrated results with a ``Type46``. All the results should go to a unique output file.
 Future version of PyBPS will support additional TRNSYS output formats.
-	
+
 Simulation log file extensions
 -------------------------------
 
@@ -87,7 +94,7 @@ Log files are files that are just kept for reference.
 
     [DAYSIM]
     LogFile_Extensions = _active.intgain.csv  # Default extensions for DAYSIM log files
-    
+
 Actually, DAYSIM does not produce log files, but since this field can't be left empty, just put here the extensions of files that won't need post-processing.
 
 Template files search string
@@ -96,7 +103,7 @@ Template files search string
 Used to identify which files are templates, that is, files containing parameter search strings to be replaced by real values.
 Template filenames should contain the specified string.
 ::
-	
+
     TemplateFile_SearchString = _Template   # Example: Model_Template.dck
 
 Parameter sample files search string
@@ -104,29 +111,29 @@ Parameter sample files search string
 
 Used to identify which file contains the parameter sample, that is, file containing real values for all parameters found in template files.
 Sample filenames should contain the specified string.
-::	
+::
 
-    SampleFile_SearchString = _Sample   # Example: Model_Sample.csv
+    SampleFile_SearchString = _Samples   # Example: Model_Sample.csv
 
-	
+
 Prerequisites
 =============
 
-In addition to the necessary configuration options commented above, there is a set of prerequisites to ensure PyBPS can work properly with your building simulation project. 
+In addition to the necessary configuration options commented above, there is a set of prerequisites to ensure PyBPS can work properly with your building simulation project.
 
 Template Files
 --------------
 
-Template files have to be properly identified by putting the search string specified in ``config.ini`` in their filename. 
+Template files have to be properly identified by putting the search string specified in ``config.ini`` in their filename.
 For example, the template file for the ``3Dbuilding.dck`` project would be ``3Dbuilding_Template.dck``.
 
 To properly work as a template file, it should contain parameter search strings in place of actual parameters that should be replaced by PyBPS in each simulation job.
-**It is a requirement of PyBPS that all parameter search strings should be strings of characters between % signs.** 
+**It is a requirement of PyBPS that all parameter search strings should be strings of characters with a leading $ sign.**
 Valid parameter search strings would look like::
 
-    %ORIENTATION%  # Valid search string for ORIENTATION parameter
-    %HEAT_SETPOINT% # Valid search string for HEAT_SETPOINT parameter
-	
+    $ORIENTATION  # Valid search string for ORIENTATION parameter
+    $HEAT_SETPOINT # Valid search string for HEAT_SETPOINT parameter
+
 Sample File
 -----------
 
@@ -141,8 +148,8 @@ For example, the sample file for the ``3Dbuilding.dck`` project would be ``3Dbui
     180,20
     180,21
     ...
-	
-	
+
+
 Usage
 =====
 
@@ -151,73 +158,73 @@ Shell Script
 
 The simplest way to start using PyBPS is by way of the shell script.
 
-Just open a command line window and call ``pybps-script.py`` followed by the path to the BPS project directory. It should look like this::
+Just open a command line window and call ``run-pybps.py`` followed by the path to the BPS project directory. It should look like this::
 
-    C:\Python27\Scripts\pybps-script.py C:\My_BPS_Project\
-	
-The script accepts optional arguments to control the number of local threads/processors to be used in simulation run and to calculate to total execution time. 
-For example, calling the script with the following arguments will limit to 2 threads/processors and give the batch execution run time::
+    $ run-pybps.py C:\My_BPS_Project\
 
-    C:\Python27\Scripts\pybps-script.py --ncore 2 --stopwatch C:\My_BPS_Project\
-	
-	
+The script accepts optional arguments to control the number of local threads/processors to be used in simulation run and to calculate to total execution time.
+For example, calling the script with the following arguments will limit to 2 threads/processors and returns the batch execution run time::
+
+    $ run-pybps.py --ncore 2 --stopwatch C:\My_BPS_Project\
+
+
 Package
 -------
 
-If you are already proficient with Python programming, you can get more control over the simulation workflow by directly using the methods of the ``PyBPS`` package in your own script. 
-The best way to start is probably by having a look at the ``pybps-script.py`` script mentioned above. 
-Anyway, here is a quick guide to the main methods and functions contained in the ``PyBPS`` package. 
+If you are already proficient with Python programming, you can get more control over the simulation workflow by directly using the methods of the ``PyBPS`` package in your own script.
+The best way to start is probably by having a look at the ``run-pybps.py`` script mentioned above.
+Anyway, here is a quick guide to the main methods and functions contained in the ``PyBPS`` package.
 
 To get started, it is necessary to import the ``BPSProject`` class definition::
 
     From pybps import BPSProject
-	
+
 An instance of the ``BPSProject`` class should then be created, giving the path to the simulation project directory as an argument::
 
     path_to_bps_project = 'C:\BPS_PROJECT'
     bpsproj = BPSProject(path_to_bps_project)
-	
+
 During the instance creation process, the given directory is analyzed and all of the information necessary to run the simulation jobs is stored in the new instance: paths to simulation input files, details about simulation tool to be used, parameter sample, etc...
-Once the new instance has been created, class methods can be used to manage the parametric simulation jobs. 
+Once the new instance has been created, class methods can be used to manage the parametric simulation jobs.
 For example, simulation jobs identified from the parameter sample can (and should) be added using the following method::
 
-	bpsproj.add_jobs()
+	  bpsproj.add_jobs()
 
-This step creates instances of a ``BPSJob`` class for each one of the identified simulation jobs. 
-Additional functions can be written by the user to modify the parameter sample prior to adding jobs to the simulation project. 
+This step creates instances of a ``BPSJob`` class for each one of the identified simulation jobs.
+Additional functions can be written by the user to modify the parameter sample prior to adding jobs to the simulation project.
 For example, it is possible to have several simulation input files listed in the project directory and select a different input file in each job based on specific parameter values.
 
 A particular job can be manage using the following methods::
 
-	bpsproj.jobs[0].prepare()    # Copy all simulation files to a temp directory where the first job will be run
-	bpsproj.jobs[0].preprocess() # Create simulation input files with set of parameters for first job
-	bpsproj.jobs[0].run()        # Run the first job
-	bpsproj.jobs[0].close()      # Copy result and log files to results dir, get job run summary and delete temp dir
-	
+	  bpsproj.jobs[0].prepare()    # Copy all simulation files to a temp directory where the first job will be run
+	  bpsproj.jobs[0].preprocess() # Create simulation input files with set of parameters for first job
+	  bpsproj.jobs[0].run()        # Run the first job
+	  bpsproj.jobs[0].close()      # Copy result and log files to results dir, get job run summary and delete temp dir
+
 The decision of which result and log files should be copied to the *Results* directory depends on the files extensions specified in the *ResultFile_Extensions* and *LogFile_Extensions* keywords of the ``config.ini`` file.
-	
-In general, it is more common to run all simulation jobs at once. 
+
+In general, it is more common to run all simulation jobs at once.
 Calling the ``run`` method without arguments launches simulation jobs in parallel using all available processors::
 
-	bpsproj.run()
+	  bpsproj.run()
 
 You can also limit the number of threads/processors used to prevent PyBPS from eating up all of the available computing resources::
 
-	bpsproj.run(ncore=2)   # limits the current run to 2 threads/processors
-	
+	  bpsproj.run(ncore=2)   # limits the current run to 2 threads/processors
+
 When all simulation jobs have been run, all of the information related to the current simulation project (job parameters, results and run summaries) can be stored in ``pandas`` DataFrames::
-	
-	bpsproj.jobs2df()
-	bpsproj.results2df()
-	bpsproj.runsum2df()
-	
+
+	  bpsproj.jobs2df()
+	  bpsproj.results2df()
+	  bpsproj.runsum2df()
+
 Once our simulation project data is in DataFrames, it can be stored in an SQlite database and/or CSV files::
 
-	bpsproj.save2db()
-	bpsproj.save2csv()
-	
+	  bpsproj.save2db()
+	  bpsproj.save2csv()
 
-	
+
+
 License
 =======
 
