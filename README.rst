@@ -2,9 +2,7 @@
 PyBPS
 =====
 
-.. image:: https://img.shields.io/badge/python-2.7-blue.svg
-
-.. image:: https://img.shields.io/badge/python-3.5-blue.svg
+.. image:: https://img.shields.io/badge/python-2.7,_3.5-blue.svg
 
 PyBPS is a simulation manager that provides a framework for running parametric simulation jobs in an efficient way.
 It includes modules to:
