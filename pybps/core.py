@@ -271,11 +271,11 @@ class BPSProject(object):
         """
 
         # Create main directory for simulation jobs if it doesn't exists
-        self.jobsdir_abspath = self.abspath + '_BATCH'
+        self.jobsdir_abspath = os.path.join(self.abspath, '../_pybps_simulations')
         util.tmp_dir('create', self.jobsdir_abspath)
         # Create directory to store jobs results in main project directory
         # if it doesn't already exists
-        self.resultsdir_abspath = os.path.join(self.jobsdir_abspath, 'Results')
+        self.resultsdir_abspath = os.path.join(self.abspath, '../_pybps_results')
         util.tmp_dir('create', self.resultsdir_abspath)
         # Remove any previously created job
         self.jobs = []
