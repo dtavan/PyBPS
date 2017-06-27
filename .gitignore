@@ -31,14 +31,8 @@ pip-log.txt
 .tox
 nosetests.xml
 
-# Translations
-*.mo
-
-# Mr Developer
-.mr.developer.cfg
-.project
-.pydevproject
-
 # IPython Notebooks
 .ipynb_checkpoints
 
+# pybps
+_pybps*

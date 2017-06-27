@@ -7,7 +7,7 @@ PyBPS
 PyBPS is a simulation manager that provides a framework for running parametric simulation jobs in an efficient way.
 It includes modules to:
 
-* **Pre-process parametric simulation jobs** (prepare simulation input files with a specific set of paramaters)
+* **Pre-process parametric simulation jobs** (prepare simulation input files with a specific set of parameters)
 
 * **Run simulation jobs in parallel**, making the most of available processors to run the parametric jobs faster
 
@@ -35,7 +35,7 @@ If you have an earlier version of PyBPS already installed that you want to upgra
 
 This will also upgrade PyBPS dependencies.
 
-Additionally, you will need to install ``jupyter notebook`` and ``matplotlib`` to view and run the tutorial notebook
+Additionally, you will need to install ``jupyter notebook`` and ``matplotlib`` to view and run the tutorial notebook::
 
     $ pip install jupyter matplotlib
 
@@ -43,7 +43,7 @@ Additionally, you will need to install ``jupyter notebook`` and ``matplotlib`` t
 Configuration
 =============
 
-Prior to using PyBPS, you first have to configure simulation tools options in the ``config.ini`` file located at the root of the ``pybps`` directory (usually ``\C:\Python27\Lib\site-packages\pybps``).
+Prior to using PyBPS, you first have to configure simulation tools options in the ``config.ini`` file located at the root of the ``pybps`` directory (usually ``C:\Python27\Lib\site-packages\pybps``).
 
 Alternatively, you can also include a ``config.ini`` file in your project directory with a project specific configuration. PyBPS will override default configuration settings whenever a custom ``config.ini`` file is found in the project directory.
 
