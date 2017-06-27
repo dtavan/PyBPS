@@ -56,8 +56,11 @@ if __name__ == '__main__':
     # Save jobs list, results and run summary DataFrames into csv files
     module.save2csv()
 
-    print("\nResults saved to following files, in batch results directory:")
+    # Save jobs list, results and run summary DataFrames into pickled files
+    module.save2pkl()
+
+    print("\nResults saved to following output files, located in '_pybps_results' directory:")
     print("- " + module.db_name)
-    print("- " + module.jobscsv_name)
-    print("- " + module.resultscsv_name)
-    print("- " + module.runsumcsv_name)
+    print("- " + module.jobs_fname + ".csv/.pkl")
+    print("- " + module.results_fname + ".csv/.pkl")
+    print("- " + module.runsum_fname + ".csv/.pkl")

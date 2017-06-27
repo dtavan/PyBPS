@@ -119,12 +119,12 @@ class BPSProject(object):
         self.resultsdir_abspath = None
         # Name of results database
         self.db_name = 'SimResults.db'
-        # Name of jobs csv file
-        self.jobscsv_name = 'SimJobs.csv'
-        # Name of results csv file
-        self.resultscsv_name = 'SimResults.csv'
-        # Name of run summary csv file
-        self.runsumcsv_name = 'RunSummary.csv'
+        # Name of jobs csv/pkl file
+        self.jobs_fname = 'SimJobs'
+        # Name of results csv/pkl file
+        self.results_fname = 'SimResults'
+        # Name of run summary csv/pkl file
+        self.runsum_fname = 'RunSummary'
         # List of relative paths to template simulation files
         self.temp_relpaths = []
         # List of parameters found in template files
@@ -579,7 +579,7 @@ class BPSProject(object):
 
 
     def save2db(self, items='all'):
-        """Save project info to database
+        """Save project jobs/results to sql database
 
         Args:
             items: 'jobs','results' and 'runsummary' respectively save jobs,
@@ -601,7 +601,7 @@ class BPSProject(object):
 
 
     def save2csv(self, items='all'):
-        """Save project info to database
+        """Save project jobs/results to csv
 
         Args:
             items: 'jobs','results' and 'runsummary' respectively save jobs,
@@ -610,11 +610,11 @@ class BPSProject(object):
         """
 
         jobscsv_abspath = os.path.join(self.resultsdir_abspath,
-                              self.jobscsv_name)
+								self.jobs_fname + '.csv')
         resultscsv_abspath = os.path.join(self.resultsdir_abspath,
-                                 self.resultscsv_name)
+                                self.results_fname + '.csv')
         runsumcsv_abspath = os.path.join(self.resultsdir_abspath,
-                                self.runsumcsv_name)
+                                self.runsum_fname + '.csv')
 
         if items == 'all' or items == 'jobs':
             self.jobs_df.to_csv(jobscsv_abspath)
@@ -622,6 +622,30 @@ class BPSProject(object):
             self.results_df.to_csv(resultscsv_abspath)
         if items == 'all' or items == 'runsummary':
             self.runsum_df.to_csv(runsumcsv_abspath)
+
+
+    def save2pkl(self, items='all'):
+        """Save project jobs/results to pickled dataframe
+
+        Args:
+            items: 'jobs','results' and 'runsummary' respectively save jobs,
+                results or run summary to the pickled file; 'all' saves everything
+
+        """
+
+        jobspkl_abspath = os.path.join(self.resultsdir_abspath,
+								self.jobs_fname + '.pkl')
+        resultspkl_abspath = os.path.join(self.resultsdir_abspath,
+								self.results_fname + '.pkl')
+        runsumpkl_abspath = os.path.join(self.resultsdir_abspath,
+                                self.runsum_fname + '.pkl')
+
+        if items == 'all' or items == 'jobs':
+            self.jobs_df.to_pickle(jobspkl_abspath)
+        if items == 'all' or items == 'results':
+            self.results_df.to_pickle(resultspkl_abspath)
+        if items == 'all' or items == 'runsummary':
+            self.runsum_df.to_pickle(runsumpkl_abspath)
 
 
     def getfromdb_jobs(self, seriesID=None, db_name="SimResults.db"):
