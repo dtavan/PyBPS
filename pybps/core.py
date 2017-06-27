@@ -12,6 +12,7 @@ from multiprocessing import Pool, cpu_count, freeze_support
 from time import time, sleep
 from random import uniform
 from shutil import copy, copytree
+from string import Template
 
 # Third-party imports
 import pandas as pd
@@ -745,18 +746,13 @@ class BPSJob(BPSProject):
                                            os.path.dirname(temp_abspath),
                                            match.group(1) + match.group(2))
                 # Replace parameters with sample values in template file
-                with open(temp_abspath, 'rU') as tmp_f:
+                with open(temp_abspath, 'rU') as T:
                     # Read the entire file and store it in a temp variable
-                    temp = tmp_f.read()
-                    # Find parameters to be replaced in template files and
-                    # replace them
-                    for p in self.temp_params:
-		                # If search string is found, replace with
-                        # corresponding parameter value
-                        temp = temp.replace('%' + p + '%',
-                                   str(self.jobdict[p]))
+                    template = Template(T.read())
+                    # Substitute the dollar-sign variables with values
+                    temp = template.safe_substitute(self.jobdict)
                     # Replace special &PROJECT_DIR& var with cur dir path
-                    temp = temp.replace('&PROJ_DIR&', str(self.abspath))
+                    #temp = temp.replace('&PROJ_DIR&', str(self.abspath))
                     # Proper way to manage existing model files
                     if os.path.exists(siminput_abspath):
                         try:
