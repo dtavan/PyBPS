@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name = 'pybps',
-    version = '0.2.0',
+    version = '0.2.1',
     description = 'A parametric simulation manager for building performance simulation projects',
     long_description = open('README.rst').read(),
     classifiers = [
@@ -25,5 +25,5 @@ setup(
     packages = find_packages(),
     package_data = {'':['*.ini']},
     install_requires = ['pandas'],
-    scripts = ['bin/pybps-script.py','bin/pybps_daysim-exe.bat'],
+    scripts = ['bin/run-pybps.py','bin/pybps_daysim-exe.bat'],
 )
