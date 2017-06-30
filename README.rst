@@ -2,7 +2,7 @@
 PyBPS
 =====
 
-.. image:: https://img.shields.io/badge/python-2.7,_3.5-blue.svg
+.. image:: https://img.shields.io/badge/python-2.7,_3.6-blue.svg
 
 PyBPS is a simulation manager that provides a framework for running parametric simulation jobs in an efficient way.
 It includes modules to:
@@ -233,4 +233,4 @@ This software is licensed under the ``3-clause BSD license``. See the ``LICENSE`
 Contributors
 ============
 
-PyBPS is open to contributions! Feel free to fork `the repository <http://github.com/aiguasol/pybps>`_ on github to start making your changes.
+PyBPS is open to contributions! Feel free to fork `the repository <https://github.com/dtavan/PyBPS>`_ on github to start making your changes.
