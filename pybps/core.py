@@ -422,13 +422,13 @@ class BPSProject(object):
             print("No template found. BPS project identified as single run")
 
 
-    def run(self, ncore='max', stopwatch=False, run_mode='silent', debug=False):
+    def run(self, ncore=-1, stopwatch=False, run_mode='silent', debug=False):
         """Run simulation jobs
 
         Args:
             ncore: number of local cores/threads to be used at a time
                For ncore>=2, jobs will run in parallel.
-               By default, all local cores are used to run jobs in parallel
+               By default (ncore=-1), the max number of local cores is used
             stopwatch: flag to activate a stopwatch that monitors job run time
             run_mode: for simulation tool that have this kind of command line
                flag, allows to run tools in silent or continuous mode
@@ -483,7 +483,7 @@ class BPSProject(object):
                 if stopwatch == True:
                     start_time = time()
                 # Create multiprocessing pool for parallel subprocess run
-                if ncore == 'max':
+                if ncore <= 0:
                     pool = Pool(None)
                     print(str(cpu_count()) +
                         ' core(s) used in current run (max local cores)\n')
@@ -503,8 +503,7 @@ class BPSProject(object):
                 # Stop timer if stopwatch requested by user
                 if stopwatch == True:
                     self.simtime = time()-start_time
-                    print('\nSimulation batch runtime: ' +
-                        str(self.simtime) + ' seconds')
+                    print('\nSimulation batch runtime: {:.2f} seconds'.format(self.simtime))
 		    # Print an error message if no jobs were found
             else:
                 print("\nNo simulation jobs found" +
@@ -565,7 +564,7 @@ class BPSProject(object):
                         for dict in dict_list:
                             dict['JobID'] = match.group()
                         colnames = dict_list[0].keys()
-                        colnames.sort(key = sort_key_dfcolnames)
+                        #colnames.sort(key = sort_key_dfcolnames)
                         if not df_exists:
                             self.results_df = pd.DataFrame(dict_list,
                                               columns=colnames)
