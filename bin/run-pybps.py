@@ -4,46 +4,34 @@
 
 import sys
 import os
+import argparse
 
 from pybps import BPSProject
 
 
 if __name__ == '__main__':
 
-    args = sys.argv[1:]
-    if not args:
-        print "usage: run-pybps.py [--ncore ncore] [--stopwatch] <projdir_path>";
-        sys.exit(1)
+    parser = argparse.ArgumentParser(description='Run PyBPS parametric simulation manager.')
 
-    # ncore and stopwatch are either set from command line
-    # or left as the empty string.
-    # The args array is left just containing the dirs.
-    ncore = 'max'
-    if args[0] == '--ncore':
-        ncore = int(args[1])
-        del args[0:2]
+    parser.add_argument('model_path', help='path to folder containing model')
+    parser.add_argument('--ncore', default=-1, type=int, help='Number of local cores used for parallel simulations (default: -1 to use all local cores)')
+    parser.add_argument('--stopwatch', action='store_true', help='Enables stopwatch to return total simulation run time.')
 
-    stopwatch = False
-    if args[0] == '--stopwatch':
-        stopwatch = True
-        del args[0:1]
+    args = parser.parse_args()
 
-    if len(args) == 0:
-        print "error: must specify one project directory"
-        sys.exit(1)
+    print(args)
 
-
-    projdir_path = os.path.abspath(args[0])
+    model_path = os.path.abspath(args.model_path)
 
 	# Creatw new instance of BPSProject class to hold all of the info
 	# about simulation project
-    module = BPSProject(projdir_path)
+    module = BPSProject(model_path)
 
     # Add simulation jobs to BPSProject instance
     module.add_jobs()
 
     # Run simulation jobs
-    module.run(ncore, stopwatch)
+    module.run(args.ncore, args.stopwatch)
 
     # Get jobs list, results and run summary into pandas DataFrames
     module.jobs2df()
